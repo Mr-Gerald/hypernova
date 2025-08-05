@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 // This function lazily initializes and returns the AI client, only if an API key is available.
 const getAiClient = () => {
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+  const API_KEY = process.env.API_KEY;
   if (!API_KEY) {
     return null;
   }

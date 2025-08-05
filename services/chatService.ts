@@ -11,7 +11,7 @@ const getChat = (): Chat | null => {
         return chat;
     }
 
-    const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+    const API_KEY = process.env.API_KEY;
     if (!API_KEY) {
         console.warn("Gemini API key not found. Chatbot will be disabled.");
         return null;
