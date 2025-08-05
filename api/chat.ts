@@ -26,7 +26,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             Keep your answers concise, clear, and professional.
             Our core services are: Express Delivery (fast domestic and international), International Freight (air and sea), and Warehousing.
             Users can track packages on the 'Track' page, book shipments on the 'Book Shipment' page (requires login), and get a quote on the homepage.
-            If you don't know an answer, politely say you can't help with that specific query and suggest they contact support at support@hypernova.express.
+            If you don't know an answer or if the user needs specific help, politely say you can't help with that query and suggest they contact the support team.
+            Our support details are:
+            - Email: hypernovaexpress@outlook.com
+            - Phone / WhatsApp: (201) 381-0806
             Do not make up information about specific shipment details; instead, guide them to the tracking page. Do not offer to perform actions like booking or tracking for them, but rather guide them on how to use the website to do it themselves.`;
 
         const contents = history.map((msg: { sender: 'user' | 'ai', text: string }) => ({

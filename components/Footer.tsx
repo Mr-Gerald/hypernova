@@ -47,9 +47,9 @@ const Footer: React.FC = () => {
                 <div>
                      <h3 className="font-semibold text-nova-light tracking-wider uppercase mb-4">Contact Us</h3>
                      <ul className="space-y-2 text-nova-gray">
-                        <li>500 Terry A Francois Blvd, San Francisco, CA 94158, United States</li>
+                        <li>500 Terry A Francois Blvd, San Francisco, CA 94158</li>
                         <li>Email: hypernovaexpress@outlook.com</li>
-                        <li>Phone: (201) 381-0806</li>
+                        <li>Phone / WhatsApp: (201) 381-0806</li>
                      </ul>
                 </div>
             </div>
