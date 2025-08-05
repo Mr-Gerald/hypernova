@@ -69,7 +69,7 @@ const Chatbot: React.FC = () => {
       >
         {/* Header */}
         <div className="flex-shrink-0 bg-nova-dark p-4 rounded-t-xl flex justify-between items-center border-b border-nova-gray/20">
-          <h3 className="text-lg font-bold text-nova-light">HyperNova AI Assistant</h3>
+          <h3 className="text-lg font-bold text-nova-light">HyperNova Assistant</h3>
           <button onClick={() => setIsOpen(false)} aria-label="Close chat" className="text-nova-gray hover:text-nova-light text-2xl">&times;</button>
         </div>
 
