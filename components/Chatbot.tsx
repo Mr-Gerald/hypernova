@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { sendMessageStream } from '../services/chatService';
+import { getChatStream } from '../services/chatService';
 
 type Message = {
   sender: 'user' | 'ai';
@@ -31,28 +31,45 @@ const Chatbot: React.FC = () => {
     const userMessage = inputValue.trim();
     if (!userMessage || isLoading) return;
 
-    const newMessages: Message[] = [...messages, { sender: 'user', text: userMessage }];
-    setMessages(newMessages);
+    // Capture history before this new message
+    const history = messages;
+
+    // Add user message and AI placeholder to state immediately for snappy UI
+    setMessages([...history, { sender: 'user', text: userMessage }, { sender: 'ai', text: '' }]);
     setInputValue('');
     setIsLoading(true);
-    
-    // Add a placeholder for the AI response
-    setMessages(prev => [...prev, { sender: 'ai', text: '' }]);
 
     try {
-        const stream = await sendMessageStream(userMessage);
-        for await (const chunk of stream) {
-            setMessages(prev => {
-                const updatedMessages = [...prev];
-                updatedMessages[updatedMessages.length - 1].text += chunk.text;
-                return updatedMessages;
-            });
-        }
+        await getChatStream(
+            history, 
+            userMessage, 
+            (chunkText) => { // onChunk callback
+                setMessages(prev => {
+                    const updatedMessages = [...prev];
+                    const lastMessage = updatedMessages[updatedMessages.length - 1];
+                    if (lastMessage) {
+                      lastMessage.text += chunkText;
+                    }
+                    return updatedMessages;
+                });
+            },
+            (errorText) => { // onError callback
+                setMessages(prev => {
+                    const updatedMessages = [...prev];
+                    const lastMessage = updatedMessages[updatedMessages.length - 1];
+                     if (lastMessage) {
+                      lastMessage.text = `Sorry, an error occurred: ${errorText}`;
+                    }
+                    return updatedMessages;
+                });
+            }
+        );
     } catch (error) {
-        console.error("Chatbot error:", error);
+        // This catch is for network errors before the stream starts
+        console.error("Chatbot sendMessage error:", error);
         setMessages(prev => {
             const newMessages = [...prev];
-            newMessages[newMessages.length - 1].text = 'Sorry, I encountered an error. Please try again.';
+            newMessages[newMessages.length - 1].text = 'Sorry, I couldn\'t connect to the chat service. Please try again.';
             return newMessages;
         });
     } finally {
@@ -77,20 +94,19 @@ const Chatbot: React.FC = () => {
         <div className="flex-grow p-4 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`rounded-lg p-3 max-w-[80%] whitespace-pre-wrap ${msg.sender === 'user' ? 'bg-nova-red text-white rounded-br-none' : 'bg-nova-dark text-nova-light rounded-bl-none'}`}>
+              <div className={`rounded-lg p-3 max-w-[80%] whitespace-pre-wrap break-words ${msg.sender === 'user' ? 'bg-nova-red text-white rounded-br-none' : 'bg-nova-dark text-nova-light rounded-bl-none'}`}>
                 {msg.text}
+                {/* Typing indicator for empty, loading AI message */}
+                {isLoading && index === messages.length - 1 && msg.text === '' && (
+                    <div className="flex items-center space-x-2">
+                        <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                        <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                        <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse"></span>
+                   </div>
+                )}
               </div>
             </div>
           ))}
-          {isLoading && messages[messages.length-1].sender === 'ai' && (
-             <div className="flex justify-start">
-               <div className="rounded-lg p-3 max-w-[80%] bg-nova-dark text-nova-light rounded-bl-none flex items-center space-x-2">
-                 <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse [animation-delay:-0.3s]"></span>
-                 <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse [animation-delay:-0.15s]"></span>
-                 <span className="w-2 h-2 bg-nova-gray rounded-full animate-pulse"></span>
-               </div>
-             </div>
-          )}
           <div ref={messagesEndRef} />
         </div>
 
