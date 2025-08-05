@@ -2,10 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { trackShipment, updateShipmentStatus } from '../../services/mockApi';
-import { Shipment, ShipmentStatus } from '../../types';
+import { Shipment } from '../../types';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import Select from '../../components/ui/Select';
+
+const STATUS_OPTIONS = ['Booked', 'In Transit', 'Out for Delivery', 'Delivered', 'Delayed', 'On Hold', 'Cancelled'];
 
 const AdminUpdateShipmentPage: React.FC = () => {
     const { trackingNumber } = useParams<{ trackingNumber: string }>();
@@ -67,7 +70,10 @@ const AdminUpdateShipmentPage: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-4 border-b border-nova-gray/20 pb-2">Add New Status Update</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {error && <p className="bg-red-900/50 text-red-300 p-3 rounded-md text-center">{error}</p>}
-                            <Input label="Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} placeholder="e.g., In Transit, Delivered" required/>
+                            <Select label="Status" value={newStatus} onChange={e => setNewStatus(e.target.value)} required>
+                                <option value="" disabled>Select a status</option>
+                                {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            </Select>
                             <Input label="Location" value={newLocation} onChange={e => setNewLocation(e.target.value)} placeholder="e.g., Central Hub" required/>
                             <Input label="Comment" value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="e.g., Departed from facility" required/>
                             <Button type="submit" isLoading={isUpdating}>Add Update</Button>

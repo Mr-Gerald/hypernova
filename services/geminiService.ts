@@ -1,17 +1,20 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Assume process.env.API_KEY is configured in the build environment
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  console.warn("Gemini API key not found. AI features will be disabled.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+// This function lazily initializes and returns the AI client, only if an API key is available.
+const getAiClient = () => {
+  const API_KEY = process.env.API_KEY;
+  if (!API_KEY) {
+    return null;
+  }
+  return new GoogleGenAI({ apiKey: API_KEY });
+};
 
 export const generateLogisticsInsights = async (): Promise<string> => {
-  if (!API_KEY) {
+  const ai = getAiClient();
+  
+  if (!ai) {
+    console.warn("Gemini API key not found. AI features will be disabled.");
     return "AI service is currently unavailable. Please configure the API Key.";
   }
   
